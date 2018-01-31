@@ -172,6 +172,10 @@
  */
 @property (assign, nonatomic) CGFloat topContentAdditionalInset;
 
+//MARK:- set for making it compatible with iPhone X.
+@property (assign, nonatomic) CGFloat heightFromBottomForX;
+
+
 #pragma mark - Class methods
 
 /**

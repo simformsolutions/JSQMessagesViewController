@@ -170,7 +170,9 @@ JSQMessagesKeyboardControllerDelegate>
 - (void)jsq_configureMessagesViewController
 {
     self.view.backgroundColor = [UIColor whiteColor];
-
+    
+    [self isIPhoneX];
+    
     self.jsq_isObserving = NO;
 
     self.toolbarHeightConstraint.constant = self.inputToolbar.preferredDefaultHeight;
@@ -317,6 +319,22 @@ JSQMessagesKeyboardControllerDelegate>
     [self.keyboardController endListeningForKeyboard];
 }
 
+#pragma mark - Check For iPhoneX
+- (void)isIPhoneX {
+    
+    if (@available(iOS 11.0, *)) {
+        UIWindow* window = [UIApplication.sharedApplication delegate].window;
+        if (window.safeAreaInsets.top > 0) {
+            CGFloat bottomPadding = window.safeAreaInsets.bottom;
+            self.toolbarBottomLayoutGuide.constant = bottomPadding;
+            self.heightFromBottomForX = bottomPadding;
+        } else {
+            self.toolbarBottomLayoutGuide.constant = 0;
+            self.heightFromBottomForX = 0;
+        }
+    }
+    
+}
 
 #pragma mark - View rotation
 
@@ -904,13 +922,14 @@ JSQMessagesKeyboardControllerDelegate>
 
 - (void)keyboardController:(JSQMessagesKeyboardController *)keyboardController keyboardDidChangeFrame:(CGRect)keyboardFrame
 {
-    if (![self.inputToolbar.contentView.textView isFirstResponder] && self.toolbarBottomLayoutGuide.constant == 0.0) {
+    if (![self.inputToolbar.contentView.textView isFirstResponder] && self.toolbarBottomLayoutGuide.constant == self.heightFromBottomForX) {
         return;
     }
 
     CGFloat heightFromBottom = CGRectGetMaxY(self.collectionView.frame) - CGRectGetMinY(keyboardFrame);
 
-    heightFromBottom = MAX(0.0, heightFromBottom);
+    
+    heightFromBottom = MAX(self.heightFromBottomForX, heightFromBottom);
 
     [self jsq_setToolbarBottomLayoutGuideConstant:heightFromBottom];
 }
